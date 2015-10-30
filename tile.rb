@@ -1,6 +1,5 @@
 class Tile
-  def initialize(board, value)
-    @board = board
+  def initialize(value)
     @value = value
     @revealed = false
   end
