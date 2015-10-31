@@ -17,7 +17,6 @@ class Board
     bombs_board
   end
 
-
   def num_bomb_neighbors(pos)
     indices = find_neighbors(pos)
     bomb_count = indices.count { |pos| @board[pos[0]][pos[1]] == :b}
@@ -49,15 +48,41 @@ class Board
         else
           tile_value = num_bomb_neighbors([row_index, tile_index])
         end
-        Tile.new(tile_value)
+        Tile.new(tile_value, self)
       end
     end
     board_with_tiles
   end
 
-  def reveal(pos)
+  def base_case?(pos)
+    value = @tile_board[pos[0]][pos[1]].value
+    if value.is_a?(Fixnum)
+      return true if value > 0
+    end
+    !find_neighbors(pos).any? do |np|
+      tile = @tile_board[np[0]][np[1]]
+      tile.revealed == false && tile.value == 0
+    end
   end
 
+  def show_board
+    @tile_board.map do |row|
+      row.map do |tile|
+        tile.value
+      end
+    end
+  end
 
+  def reveal(pos)
+    @tile_board[pos[0]][pos[1]].revealed = true
+    return if base_case?(pos)
+
+    find_neighbors(pos).each do |nei|
+      x, y = nei
+      nei_tile = @tile_board[x][y]
+      nei_tile.revealed = true if nei_tile.value.is_a?(Fixnum)
+      reveal([x, y])
+    end
+  end
 
 end
