@@ -56,13 +56,7 @@ class Board
 
   def base_case?(pos)
     value = @tile_board[pos[0]][pos[1]].value
-    if value.is_a?(Fixnum)
-      return true if value > 0
-    end
-    !find_neighbors(pos).any? do |np|
-      tile = @tile_board[np[0]][np[1]]
-      tile.revealed == false && tile.value == 0
-    end
+    value.is_a?(Fixnum) && value > 0
   end
 
   def show_board
@@ -75,12 +69,11 @@ class Board
 
   def reveal(pos)
     @tile_board[pos[0]][pos[1]].revealed = true
-    return if base_case?(pos)
-
+    return nil if base_case?(pos)
     find_neighbors(pos).each do |nei|
       x, y = nei
       nei_tile = @tile_board[x][y]
-      nei_tile.revealed = true if nei_tile.value.is_a?(Fixnum)
+      next if nei_tile.value == :b || nei_tile.revealed
       reveal([x, y])
     end
   end
